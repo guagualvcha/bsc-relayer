@@ -2,17 +2,16 @@ package relayer
 
 import (
 	"github.com/binance-chain/bsc-relayer/common"
-	"github.com/binance-chain/bsc-relayer/executor"
 )
 
-func CleanPreviousPackages(bbcExecutor *executor.BBCExecutor, bscExecutor *executor.BSCExecutor, height uint64) error {
+func (r *Relayer)cleanPreviousPackages(height uint64) error {
 	blockSynced := false
-	for _, channelId := range bbcExecutor.Config.CrossChainConfig.MonitorChannelList {
-		nextSequence, err := bbcExecutor.GetNextSequence(common.CrossChainChannelID(channelId), int64(height))
+	for _, channelId := range r.bbcExecutor.Config.CrossChainConfig.MonitorChannelList {
+		nextSequence, err := r.bbcExecutor.GetNextSequence(common.CrossChainChannelID(channelId), int64(height))
 		if err != nil {
 			return err
 		}
-		nextDeliverSequence, err := bscExecutor.GetNextSequence(common.CrossChainChannelID(channelId))
+		nextDeliverSequence, err := r.bscExecutor.GetNextSequence(common.CrossChainChannelID(channelId))
 		if err != nil {
 			return err
 		}
@@ -21,14 +20,14 @@ func CleanPreviousPackages(bbcExecutor *executor.BBCExecutor, bscExecutor *execu
 		if nextSequence > nextDeliverSequence {
 			if !blockSynced {
 
-				tx, err := bscExecutor.SyncTendermintLightClientHeader(height + 1)
+				tx, err := r.bscExecutor.SyncTendermintLightClientHeader(height + 1)
 				if err != nil {
 					return err
 				}
 				blockSynced = true
 				common.Logger.Infof("Sync header %d, txHash %s", height+1, tx.String())
 			}
-			_, err = bscExecutor.BatchRelayCrossChainPackages(common.CrossChainChannelID(channelId), nextDeliverSequence, nextSequence, height)
+			_, err = r.bscExecutor.BatchRelayCrossChainPackages(common.CrossChainChannelID(channelId), nextDeliverSequence, nextSequence, height)
 			if err != nil {
 				return err
 			}
