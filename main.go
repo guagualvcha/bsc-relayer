@@ -3,12 +3,12 @@ package main
 import (
 	"flag"
 	"fmt"
-	"github.com/binance-chain/bsc-relayer/admin"
 
 	"github.com/jinzhu/gorm"
 	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
 
+	"github.com/binance-chain/bsc-relayer/admin"
 	"github.com/binance-chain/bsc-relayer/common"
 	config "github.com/binance-chain/bsc-relayer/config"
 	"github.com/binance-chain/bsc-relayer/executor"
@@ -131,7 +131,7 @@ func main() {
 	common.Logger.Info("Starting relayer")
 	relayerInstance.Start(startHeight)
 
-	adm := admin.NewAdmin(cfg)
+	adm := admin.NewAdmin(db, cfg)
 	go adm.Serve()
 
 	select {}
