@@ -37,4 +37,5 @@ func (r *Relayer) Start(startHeight uint64) {
 	if len(r.cfg.BSCConfig.MonitorDataSeedList) >= 2 {
 		go r.doubleSignMonitorDaemon()
 	}
+	go r.alert()
 }
